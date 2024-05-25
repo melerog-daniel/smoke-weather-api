@@ -1,6 +1,9 @@
 spring:
   application:
     name: smoke-weather-api
+  mvc:
+    servlet:
+      path: /api/v1
   data:
     mongodb:
       uri: mongodb://localhost:27017
