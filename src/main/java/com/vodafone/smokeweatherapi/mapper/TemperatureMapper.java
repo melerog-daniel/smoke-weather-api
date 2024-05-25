@@ -11,7 +11,7 @@ public class TemperatureMapper {
 
     public static TemperatureResponse fromEntityToResponse(final Temperature temperature) {
         TemperatureResponse response = new TemperatureResponse();
-        response.setTemperature(temperature.getTemperature());
+        response.setTemperature(temperature.getTemperatureValue());
         return response;
     }
 }
