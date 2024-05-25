@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: smoke-weather-api
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: smoke-weather
+      auto-index-creation: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+server:
+  port: 8000
