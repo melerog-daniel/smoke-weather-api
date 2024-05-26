@@ -26,8 +26,7 @@ public class TemperatureServiceImpl implements TemperatureService {
     private final ProducerService producerService;
 
     public TemperatureServiceImpl(TemperatureRepository temperatureRepository,
-                                  MicroserviceEnvironment microserviceEnvironment,
-                                  ProducerService producerService) {
+                                  ProducerService producerService, MicroserviceEnvironment microserviceEnvironment) {
         this.temperatureRepository = temperatureRepository;
         this.producerService = producerService;
         var restClient = RestClient.builder().baseUrl(microserviceEnvironment.getOpenMeteoApiUrl()).
@@ -71,7 +70,9 @@ public class TemperatureServiceImpl implements TemperatureService {
 
     @Override
     public boolean deleteTemperature(final CoordinatesRequestDto coordinates) {
-        return temperatureRepository.deleteByLatitudeAndLongitude(coordinates.getLatitude(), coordinates.getLongitude()) > 0;
+        return temperatureRepository.deleteByLatitudeAndLongitude(
+                coordinates.getLatitude(),
+                coordinates.getLongitude()) > 0;
     }
 
     private void updateTemperature(OpenMeteoTemperatureResponseDto openMeteoTemperature, Temperature temperature) {

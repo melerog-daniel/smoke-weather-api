@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OpenMeteoTemperatureResponseDto {
-
     private double latitude;
     private double longitude;
     private double generationtimeMs;
