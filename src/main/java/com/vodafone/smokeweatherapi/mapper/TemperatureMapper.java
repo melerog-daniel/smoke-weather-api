@@ -1,6 +1,6 @@
 package com.vodafone.smokeweatherapi.mapper;
 
-import com.vodafone.smokeweatherapi.dto.response.TemperatureResponse;
+import com.vodafone.smokeweatherapi.dto.response.TemperatureResponseDto;
 import com.vodafone.smokeweatherapi.entity.Temperature;
 
 public class TemperatureMapper {
@@ -9,9 +9,11 @@ public class TemperatureMapper {
         throw new IllegalStateException("Utility class");
     }
 
-    public static TemperatureResponse fromEntityToResponse(final Temperature temperature) {
-        TemperatureResponse response = new TemperatureResponse();
+    public static TemperatureResponseDto fromEntityToDto(final Temperature temperature) {
+        TemperatureResponseDto response = new TemperatureResponseDto();
         response.setTemperature(temperature.getTemperatureValue());
+        response.setLatitude(temperature.getLatitude());
+        response.setLongitude(temperature.getLongitude());
         return response;
     }
 }

@@ -1,8 +1,10 @@
 package com.vodafone.smokeweatherapi.service;
 
-import com.vodafone.smokeweatherapi.dto.request.CoordinatesRequest;
-import com.vodafone.smokeweatherapi.dto.response.TemperatureResponse;
+import com.vodafone.smokeweatherapi.dto.request.CoordinatesRequestDto;
+import com.vodafone.smokeweatherapi.dto.response.TemperatureResponseDto;
 
 public interface TemperatureService {
-    TemperatureResponse getTemperature(final CoordinatesRequest request);
+    TemperatureResponseDto getTemperature(CoordinatesRequestDto request);
+
+    boolean deleteTemperature(CoordinatesRequestDto request);
 }

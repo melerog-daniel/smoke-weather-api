@@ -15,3 +15,14 @@ spring:
 
 server:
   port: 8000
+
+open-meteo-api:
+  url: https://api.open-meteo.com/v1/
+
+logging:
+  level:
+    org:
+      apache:
+        hc:
+          client5:
+            http: debug
