@@ -23,21 +23,29 @@ public class TemperatureServiceImpl implements TemperatureService {
 
     private final TemperatureRepository temperatureRepository;
     private final OpenMeteoRepository openMeteoRepository;
+    private final ProducerService producerService;
 
-    public TemperatureServiceImpl(TemperatureRepository temperatureRepository, MicroserviceEnvironment microserviceEnvironment) {
+    public TemperatureServiceImpl(TemperatureRepository temperatureRepository,
+                                  MicroserviceEnvironment microserviceEnvironment,
+                                  ProducerService producerService) {
         this.temperatureRepository = temperatureRepository;
-        var restClient = RestClient.builder().baseUrl(microserviceEnvironment.getOpenMeteoApiUrl()).requestInterceptor(((request, body, execution) -> {
-            log.info("request {}, method {}", request.getURI(), request.getMethod());
-            return execution.execute(request, body);
-        })).build();
+        this.producerService = producerService;
+        var restClient = RestClient.builder().baseUrl(microserviceEnvironment.getOpenMeteoApiUrl()).
+                requestInterceptor(((request, body, execution) -> {
+                    log.info("request {}, method {}", request.getURI(), request.getMethod());
+                    return execution.execute(request, body);
+                })).build();
         var restClientAdapter = RestClientAdapter.create(restClient);
         var factory = HttpServiceProxyFactory.builderFor(restClientAdapter).build();
         this.openMeteoRepository = factory.createClient(OpenMeteoRepository.class);
     }
 
+    @Override
     public TemperatureResponseDto getTemperature(final CoordinatesRequestDto coordinates) {
 
-        var optionalTemperature = temperatureRepository.findTemperatureByLatitudeAndLongitude(coordinates.getLatitude(), coordinates.getLongitude());
+        var optionalTemperature = temperatureRepository.findTemperatureByLatitudeAndLongitude(
+                coordinates.getLatitude(),
+                coordinates.getLongitude());
         Temperature temperature;
 
         if (optionalTemperature.isPresent()) {
@@ -56,8 +64,9 @@ public class TemperatureServiceImpl implements TemperatureService {
             temperature.setTemperatureValue(openMeteoTemperature.getCurrent().getTemperature());
             temperatureRepository.save(temperature);
         }
-
-        return TemperatureMapper.fromEntityToDto(temperature);
+        var temperatureResponseDto = TemperatureMapper.fromEntityToDto(temperature);
+        producerService.produce(temperatureResponseDto);
+        return temperatureResponseDto;
     }
 
     @Override
@@ -81,6 +90,4 @@ public class TemperatureServiceImpl implements TemperatureService {
         long differenceMillis = currentTimeMillis - updatedAtMillis;
         return TimeUnit.MILLISECONDS.toMinutes(differenceMillis) >= 1;
     }
-
-
 }
