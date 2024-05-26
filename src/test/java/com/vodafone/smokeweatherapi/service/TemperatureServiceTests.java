@@ -24,7 +24,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -42,7 +41,7 @@ class TemperatureServiceTests {
     private static MockWebServer mockOpenMeteoWebServer;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         mockOpenMeteoWebServer = new MockWebServer();
         ReflectionTestUtils.setField(environment,
@@ -165,7 +164,7 @@ class TemperatureServiceTests {
     }
 
     @Test
-    void testDeleteTemperatureIfIsPresent() throws JsonProcessingException {
+    void testDeleteTemperatureIfIsPresent() {
         CoordinatesRequestDto coordinatesRequestDto = new CoordinatesRequestDto();
         coordinatesRequestDto.setLatitude(52.5d);
         coordinatesRequestDto.setLongitude(-87.5d);
@@ -178,7 +177,7 @@ class TemperatureServiceTests {
     }
 
     @Test
-    void testDeleteTemperatureIfIsNotPresent() throws JsonProcessingException {
+    void testDeleteTemperatureIfIsNotPresent() {
         CoordinatesRequestDto coordinatesRequestDto = new CoordinatesRequestDto();
         coordinatesRequestDto.setLatitude(52.5d);
         coordinatesRequestDto.setLongitude(-87.5d);
