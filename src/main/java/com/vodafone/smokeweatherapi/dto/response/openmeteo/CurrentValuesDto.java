@@ -10,6 +10,7 @@ import lombok.Data;
 public class CurrentValuesDto {
     private String time;
     private int interval;
+
     @JsonProperty("temperature_2m")
     private double temperature;
 }
