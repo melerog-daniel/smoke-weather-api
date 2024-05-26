@@ -1,32 +1,13 @@
 spring:
+  profiles:
+    active: ${PROFILE_ACTIVE:local}
   application:
     name: smoke-weather-api
   mvc:
     servlet:
       path: /api/v1
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017
-      database: smoke-weather
-      auto-index-creation: true
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: true
-  kafka:
-    producer:
-      bootstrap-servers: localhost:9092
-      topic: my-Topic
-
 server:
   port: 8080
 
 open-meteo-api:
-  url: https://api.open-meteo.com/v1/
-
-logging:
-  level:
-    org:
-      apache:
-        hc:
-          client5:
-            http: debug
+  url: ${OPEN_METEO_URL:https://api.open-meteo.com/v1/}

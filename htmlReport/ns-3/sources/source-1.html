@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TemperatureController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.vodafone.smokeweatherapi.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: TemperatureController (com.vodafone.smokeweatherapi.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TemperatureController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33,3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.vodafone.smokeweatherapi.controller;
+&nbsp;
+&nbsp;import com.vodafone.smokeweatherapi.dto.request.CoordinatesRequestDto;
+&nbsp;import com.vodafone.smokeweatherapi.dto.response.TemperatureResponseDto;
+&nbsp;import com.vodafone.smokeweatherapi.service.TemperatureService;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.web.bind.annotation.DeleteMapping;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j(topic = &quot;TemperatureController&quot;) //Lombok logger</b>
+<b class="fc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/temperature&quot;)
+&nbsp;public class TemperatureController {
+&nbsp;
+&nbsp;    private final TemperatureService temperatureService;
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    @Operation(summary = &quot;Get temperature by latitude and longitude&quot;,
+&nbsp;            description = &quot;Get a temperature from database providing latitude and longitude. &quot; +
+&nbsp;                    &quot;If cannot find the temperature in database or it&#39;s 1 min old, then retrieve data from open-meteo-api and update database.&quot;)
+&nbsp;    public TemperatureResponseDto getTemperature(CoordinatesRequestDto coordinates) {
+<b class="nc">&nbsp;        log.info(&quot;Get temperature, latitude: {}, longitude: {}&quot;, coordinates.getLatitude(), coordinates.getLongitude());</b>
+<b class="nc">&nbsp;        return temperatureService.getTemperature(coordinates);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping
+&nbsp;    @Operation(summary = &quot;Delete temperature by latitude and longitude&quot;,
+&nbsp;            description = &quot;Delete a temperature from database providing latitude and longitude. &quot; +
+&nbsp;                    &quot;Returns true if the delete has been successful or false if not&quot;)
+&nbsp;    public boolean deleteTemperature(CoordinatesRequestDto coordinates) {
+<b class="nc">&nbsp;        log.info(&quot;Delete temperature, latitude: {}, longitude: {}&quot;, coordinates.getLatitude(), coordinates.getLongitude());</b>
+<b class="nc">&nbsp;        return temperatureService.deleteTemperature(coordinates);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-26 22:46</div>
+</div>
+</body>
+</html>

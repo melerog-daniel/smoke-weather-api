@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TemperatureServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.vodafone.smokeweatherapi.service</a>
+</div>
+
+<h1>Coverage Summary for Class: TemperatureServiceImpl (com.vodafone.smokeweatherapi.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TemperatureServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.vodafone.smokeweatherapi.service;
+&nbsp;
+&nbsp;import com.vodafone.smokeweatherapi.dto.request.CoordinatesRequestDto;
+&nbsp;import com.vodafone.smokeweatherapi.dto.response.TemperatureResponseDto;
+&nbsp;import com.vodafone.smokeweatherapi.dto.response.openmeteo.OpenMeteoTemperatureResponseDto;
+&nbsp;import com.vodafone.smokeweatherapi.entity.Temperature;
+&nbsp;import com.vodafone.smokeweatherapi.env.MicroserviceEnvironment;
+&nbsp;import com.vodafone.smokeweatherapi.mapper.TemperatureMapper;
+&nbsp;import com.vodafone.smokeweatherapi.repository.OpenMeteoRepository;
+&nbsp;import com.vodafone.smokeweatherapi.repository.TemperatureRepository;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.client.RestClient;
+&nbsp;import org.springframework.web.client.support.RestClientAdapter;
+&nbsp;import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j(topic = &quot;TemperatureService&quot;)</b>
+&nbsp;@Service
+&nbsp;public class TemperatureServiceImpl implements TemperatureService {
+&nbsp;
+&nbsp;    private final TemperatureRepository temperatureRepository;
+&nbsp;    private final OpenMeteoRepository openMeteoRepository;
+&nbsp;    private final ProducerService producerService;
+&nbsp;
+<b class="fc">&nbsp;    public TemperatureServiceImpl(TemperatureRepository temperatureRepository,</b>
+&nbsp;                                  ProducerService producerService, MicroserviceEnvironment microserviceEnvironment) {
+<b class="fc">&nbsp;        this.temperatureRepository = temperatureRepository;</b>
+<b class="fc">&nbsp;        this.producerService = producerService;</b>
+<b class="fc">&nbsp;        var restClient = RestClient.builder().baseUrl(microserviceEnvironment.getOpenMeteoApiUrl()).</b>
+<b class="fc">&nbsp;                requestInterceptor(((request, body, execution) -&gt; {</b>
+<b class="fc">&nbsp;                    log.info(&quot;request {}, method {}&quot;, request.getURI(), request.getMethod());</b>
+<b class="fc">&nbsp;                    return execution.execute(request, body);</b>
+<b class="fc">&nbsp;                })).build();</b>
+<b class="fc">&nbsp;        var restClientAdapter = RestClientAdapter.create(restClient);</b>
+<b class="fc">&nbsp;        var factory = HttpServiceProxyFactory.builderFor(restClientAdapter).build();</b>
+<b class="fc">&nbsp;        this.openMeteoRepository = factory.createClient(OpenMeteoRepository.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TemperatureResponseDto getTemperature(final CoordinatesRequestDto coordinates) {
+&nbsp;
+<b class="fc">&nbsp;        var optionalTemperature = temperatureRepository.findTemperatureByLatitudeAndLongitude(</b>
+<b class="fc">&nbsp;                coordinates.getLatitude(),</b>
+<b class="fc">&nbsp;                coordinates.getLongitude());</b>
+&nbsp;        Temperature temperature;
+&nbsp;
+<b class="fc">&nbsp;        if (optionalTemperature.isPresent()) {</b>
+<b class="fc">&nbsp;            temperature = optionalTemperature.get();</b>
+<b class="fc">&nbsp;            if (isUpdateNeeded(temperature.getUpdatedAt())) {</b>
+<b class="fc">&nbsp;                var openMeteoTemperature = getOpenMeteoTemperature(coordinates.getLatitude(), coordinates.getLongitude());</b>
+<b class="fc">&nbsp;                updateTemperature(openMeteoTemperature, temperature);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        } else {
+<b class="fc">&nbsp;            var openMeteoTemperature = getOpenMeteoTemperature(coordinates.getLatitude(),</b>
+<b class="fc">&nbsp;                    coordinates.getLongitude());</b>
+<b class="fc">&nbsp;            temperature = new Temperature();</b>
+<b class="fc">&nbsp;            temperature.setLatitude(coordinates.getLatitude());</b>
+<b class="fc">&nbsp;            temperature.setLongitude(coordinates.getLongitude());</b>
+<b class="fc">&nbsp;            temperature.setTemperatureValue(openMeteoTemperature.getCurrent().getTemperature());</b>
+<b class="fc">&nbsp;            temperatureRepository.save(temperature);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        var temperatureResponseDto = TemperatureMapper.fromEntityToDto(temperature);</b>
+<b class="fc">&nbsp;        producerService.produce(temperatureResponseDto);</b>
+<b class="fc">&nbsp;        return temperatureResponseDto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean deleteTemperature(final CoordinatesRequestDto coordinates) {
+<b class="fc">&nbsp;        return temperatureRepository.deleteByLatitudeAndLongitude(</b>
+<b class="fc">&nbsp;                coordinates.getLatitude(),</b>
+<b class="fc">&nbsp;                coordinates.getLongitude()) &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateTemperature(OpenMeteoTemperatureResponseDto openMeteoTemperature, Temperature temperature) {
+<b class="fc">&nbsp;        temperature.setTemperatureValue(openMeteoTemperature.getCurrent().getTemperature());</b>
+<b class="fc">&nbsp;        temperature.setUpdatedAt(new Date());</b>
+<b class="fc">&nbsp;        temperatureRepository.save(temperature);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private OpenMeteoTemperatureResponseDto getOpenMeteoTemperature(double latitude, double longitude) {
+<b class="fc">&nbsp;        return openMeteoRepository.getTemperatureByLatitudeAndLongitude(latitude, longitude, &quot;temperature_2m&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isUpdateNeeded(Date updatedAt) {
+<b class="fc">&nbsp;        long currentTimeMillis = System.currentTimeMillis();</b>
+<b class="fc">&nbsp;        long updatedAtMillis = updatedAt.getTime();</b>
+<b class="fc">&nbsp;        long differenceMillis = currentTimeMillis - updatedAtMillis;</b>
+<b class="fc">&nbsp;        return TimeUnit.MILLISECONDS.toMinutes(differenceMillis) &gt;= 1;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-26 22:46</div>
+</div>
+</body>
+</html>

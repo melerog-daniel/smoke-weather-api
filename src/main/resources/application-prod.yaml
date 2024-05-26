@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://mongodb:27017}
+      database: smoke-weather
+      auto-index-creation: true
+
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_URL:kafka:9092}
+      topic: my-Topic

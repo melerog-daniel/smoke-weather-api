@@ -38,3 +38,15 @@ services:
     image: 'mongo:latest'
     ports:
       - '27017:27017'
+
+  smoke-weather-api:
+    image: "smoke-weather-api:latest"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "kafka"
+      - "mongodb"
+    environment:
+      KAFKA_URL: "kafka:29092"
+      PROFILE_ACTIVE: "prod"
+      MONGODB_URI: "mongodb://mongodb:27017"
