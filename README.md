@@ -9,7 +9,7 @@ v21.0.3) with SpringBoot (v3.3.0) framework.
 Use the following command to build the microservice docker image.
 
 ```bash
-docker build -t smoke-weather-api:latest .
+docker build . -t smoke-weather-api:latest
 ```
 
 There is a [docker-compose.yaml](docker-compose.yaml) where this docker image is integrated with kafka and mongoDB.
